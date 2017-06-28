@@ -22,9 +22,9 @@ namespace EbillsApi.Controllers
         private string payerid;
         private string ercasBillerId;
         private string mda;
-        private Field FieldItem;
-        private Igr igr;
         private IgrRepository p;
+
+        public UtilityClass utility;
 
         //getting list of IGR
         [HttpGet]
@@ -45,6 +45,8 @@ namespace EbillsApi.Controllers
 
             var obj = JsonConvert.SerializeXmlNode(doc);
             vResponse = JObject.Parse(obj)["ValidationRequest"].ToObject<ValidationRequest>();
+
+            utility = new UtilityClass(vResponse);
 
             //checking if the product is non-tax
             if (vResponse.ProductName.Equals("Non-Tax"))
@@ -82,7 +84,7 @@ namespace EbillsApi.Controllers
                     return GetHttpMsg(vResponse, "Name or PayerId field can not be empty");
                 }
 
-                sResponse = GetResponse(vResponse, 2);
+                sResponse = utility.GetMdaResponse(vResponse, 2, ercasBillerId);
             }
 
             //checking if step is 2
@@ -104,62 +106,7 @@ namespace EbillsApi.Controllers
         }
 
 
-        //return field
-        //passing the biller id
-        public Field GetMdaField(String xtring)
-        {
-            FieldItem = new Field();
-            p = new IgrRepository();
-            igr = p.getIgr(xtring);
 
-            if (igr.Igr_abbre.Equals("ERCAS_BAUCHI"))
-            {
-                FieldItem.Name = "Lga";
-            }
-            else
-            {
-                FieldItem.Name = "Mda";
-            }
-
-            FieldItem.Type = "List";
-            FieldItem.Required = false;
-            FieldItem.Readonly = false;
-            FieldItem.MaxLength = 0;
-            FieldItem.Order = 0;
-            FieldItem.RequiredInNextStep = true;
-            FieldItem.AmountField = false;
-            FieldItem.Item = p.ListMda(xtring);
-
-            return FieldItem;
-
-        }
-
-
-        //priavte class to get response
-        private ValidationResponse GetResponse(ValidationRequest vResponse, int num)
-        {
-            sResponse.BillerName = vResponse.BillerName;
-            sResponse.BillerID = vResponse.BillerID;
-            sResponse.ProductName = vResponse.ProductName;
-            sResponse.NextStep = num;
-            sResponse.ResponseCode = "00";
-            sResponse.ResponseMessage = "Successful";
-            sResponse.Param = vResponse.Param;
-            sResponse.field = GetMdaField(ercasBillerId);
-
-            return sResponse;
-        }
-
-        //getting error response
-        private ValidationResponse GetErrorResponse(ValidationRequest vResponse, int num, string msg, string code)
-        {
-            sResponse.ProductName = vResponse.ProductName;
-            sResponse.NextStep = num;
-            sResponse.ResponseCode = code;
-            sResponse.ResponseMessage = msg;
-
-            return sResponse;
-        }
 
         //get HTTPerrorMessage
         private HttpResponseMessage GetHttpMsg(ValidationRequest vResponse, string msg=null)
@@ -170,7 +117,7 @@ namespace EbillsApi.Controllers
             }
             else
             {
-                return Request.CreateResponse<ValidationResponse>(HttpStatusCode.BadRequest, GetErrorResponse(vResponse, vResponse.Step, msg, "400"));
+                return Request.CreateResponse<ValidationResponse>(HttpStatusCode.BadRequest, utility.GetErrorResponse(vResponse, vResponse.Step, msg, "400"));
                 
             }
             

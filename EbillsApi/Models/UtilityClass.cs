@@ -23,7 +23,7 @@ namespace EbillsApi.Models
         private string ercasBillerId;
         private string mda;
         private Field FieldItem;
-        private Igr igr;
+        private Igr igr = new Igr();
         private IgrRepository p;
 
         public UtilityClass(ValidationRequest xRequest)
@@ -63,7 +63,7 @@ namespace EbillsApi.Models
         }
 
         //priavte class to get response
-        public ValidationResponse GetResponse(ValidationRequest vResponse, int num)
+        public ValidationResponse GetMdaResponse(ValidationRequest vResponse, int num, string billerid)
         {
             sResponse.BillerName = vResponse.BillerName;
             sResponse.BillerID = vResponse.BillerID;
@@ -72,7 +72,7 @@ namespace EbillsApi.Models
             sResponse.ResponseCode = "00";
             sResponse.ResponseMessage = "Successful";
             sResponse.Param = vResponse.Param;
-            sResponse.field = GetMdaField(ercasBillerId);
+            sResponse.field = GetMdaField(billerid);
 
             return sResponse;
         }
