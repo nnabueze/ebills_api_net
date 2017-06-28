@@ -106,7 +106,7 @@ namespace EbillsApi.Controllers
 
         //return field
         //passing the biller id
-        public Field GetField(String xtring)
+        public Field GetMdaField(String xtring)
         {
             FieldItem = new Field();
             p = new IgrRepository();
@@ -145,7 +145,7 @@ namespace EbillsApi.Controllers
             sResponse.ResponseCode = "00";
             sResponse.ResponseMessage = "Successful";
             sResponse.Param = vResponse.Param;
-            sResponse.field = GetField(ercasBillerId);
+            sResponse.field = GetMdaField(ercasBillerId);
 
             return sResponse;
         }
