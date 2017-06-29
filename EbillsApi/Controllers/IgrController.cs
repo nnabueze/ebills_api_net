@@ -23,6 +23,7 @@ namespace EbillsApi.Controllers
         private string ercasBillerId;
         private string mda;
         private string amount;
+        private string tin;
 
         public UtilityClass utility;
 
@@ -114,6 +115,31 @@ namespace EbillsApi.Controllers
 
         }
 
+        private HttpResponseMessage GetTax(ValidationRequest vResponse)
+        {
+            ParamToArray(vResponse.Param);
+                        //checking if step is 1
+            if (vResponse.Step.Equals(1))
+            {
+                if (string.IsNullOrEmpty(tin))
+                {
+                    return GetHttpMsg(vResponse, "Tin field can not be empty");
+                }
+
+                var Tin_verify = utility.TinVerify(tin);
+                if (Tin_verify != null)
+                {
+                    sResponse = utility.GetTinResponse(vResponse, 2,tin, ercasBillerId);
+                }
+                else
+                {
+                    return GetHttpMsg(vResponse, "Invalid Tin Number");
+                }
+            }
+
+            return GetHttpMsg(vResponse);
+        }
+
 
 
 
@@ -160,6 +186,11 @@ namespace EbillsApi.Controllers
                 if (sList[i].key.Equals("amount")) 
                 {
                     amount = sList[i].value;
+                }
+
+                if (sList[i].key.Equals("Tin")) 
+                {
+                    tin = sList[i].value;
                 }
             }
         }

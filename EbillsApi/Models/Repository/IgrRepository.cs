@@ -254,5 +254,41 @@ namespace EbillsApi.Models.Repository
                 throw ex;
             }
         }
+
+        //getting  a single tin result
+        public Dictionary<string,string> TinVerify(string tin)
+        {
+            Dictionary<string, string> p = new Dictionary<string, string>();
+            MySql.Data.MySqlClient.MySqlDataReader mySqlReader = null;
+
+            String sqlString = "SELECT * FROM tins WHERE tin_no = '" + tin + "' OR temporary_tin= '" + tin + "'";
+            try
+            {
+                MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(sqlString, conn);
+                using (mySqlReader = cmd.ExecuteReader())
+                {
+                    if (mySqlReader.Read())
+                    {
+
+                        p.Add("name", (string)mySqlReader["name"]);
+                        p.Add("phone", (string)mySqlReader["phone"]);
+                        p.Add("Tin",tin);
+
+
+                        return p;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }

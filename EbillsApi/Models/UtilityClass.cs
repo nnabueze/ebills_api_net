@@ -93,6 +93,21 @@ namespace EbillsApi.Models
             return sResponse;
         }
 
+        //Getting tin verification response
+        public ValidationResponse GetTinResponse(ValidationRequest vResponse, int num,string tin, string billerid)
+        {
+            sResponse.BillerName = vResponse.BillerName;
+            sResponse.BillerID = vResponse.BillerID;
+            sResponse.ProductName = vResponse.ProductName;
+            sResponse.NextStep = num;
+            sResponse.ResponseCode = "00";
+            sResponse.ResponseMessage = "Successful";
+            sResponse.Param = TinVerify(tin);
+            sResponse.field = GetMdaField(billerid);
+
+            return sResponse;
+        }
+
         //priavte class to get response
         public ValidationResponse GetSubheadResponse(ValidationRequest vResponse, int num, string billerid)
         {
@@ -145,6 +160,22 @@ namespace EbillsApi.Models
                 
             }
             
+        }
+
+        //getting tin verification
+        public IList<Param> TinVerify(string tin)
+        {
+            IList<Param> Result = new List<Param>();
+            foreach (var items in p.TinVerify(tin))
+            {
+                Param item = new Param();
+
+                item.key = items.Key;
+                item.value = items.Value;
+
+                Result.Add(item);
+            }
+            return Result;
         }
 
 
