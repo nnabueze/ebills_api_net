@@ -18,13 +18,10 @@ namespace EbillsApi.Models
     {
         private ValidationRequest vResponse = new ValidationRequest();
         private ValidationResponse sResponse = new ValidationResponse();
-        private string name;
-        private string payerid;
-        private string ercasBillerId;
-        private string mda;
+        private Mda mda;
         private Field FieldItem;
         private Igr igr = new Igr();
-        private IgrRepository p;
+        private IgrRepository p = new IgrRepository();
 
         public UtilityClass(ValidationRequest xRequest)
         {
@@ -37,7 +34,6 @@ namespace EbillsApi.Models
         public Field GetMdaField(String xtring)
         {
             FieldItem = new Field();
-            p = new IgrRepository();
             igr = p.getIgr(xtring);
 
             if (igr.Igr_abbre.Equals("ERCAS_BAUCHI"))
@@ -62,6 +58,26 @@ namespace EbillsApi.Models
 
         }
 
+        public Field GetSubheadField(String xtring)
+        {
+            FieldItem = new Field();
+            mda = p.GetMda(xtring);
+            
+
+            FieldItem.Name = "Subhead";
+            FieldItem.Type = "List";
+            FieldItem.Required = false;
+            FieldItem.Readonly = false;
+            FieldItem.MaxLength = 0;
+            FieldItem.Order = 0;
+            FieldItem.RequiredInNextStep = true;
+            FieldItem.AmountField = false;
+            FieldItem.Item = p.ListSubhead(mda.Id);
+
+            return FieldItem;
+
+        }
+
         //priavte class to get response
         public ValidationResponse GetMdaResponse(ValidationRequest vResponse, int num, string billerid)
         {
@@ -73,6 +89,34 @@ namespace EbillsApi.Models
             sResponse.ResponseMessage = "Successful";
             sResponse.Param = vResponse.Param;
             sResponse.field = GetMdaField(billerid);
+
+            return sResponse;
+        }
+
+        //priavte class to get response
+        public ValidationResponse GetSubheadResponse(ValidationRequest vResponse, int num, string billerid)
+        {
+            sResponse.BillerName = vResponse.BillerName;
+            sResponse.BillerID = vResponse.BillerID;
+            sResponse.ProductName = vResponse.ProductName;
+            sResponse.NextStep = num;
+            sResponse.ResponseCode = "00";
+            sResponse.ResponseMessage = "Successful";
+            sResponse.Param = vResponse.Param;
+            sResponse.field = GetSubheadField(billerid);
+
+            return sResponse;
+        }
+
+        public ValidationResponse GetResponse(ValidationRequest vResponse, int num)
+        {
+            sResponse.BillerName = vResponse.BillerName;
+            sResponse.BillerID = vResponse.BillerID;
+            sResponse.ProductName = vResponse.ProductName;
+            sResponse.NextStep = num;
+            sResponse.ResponseCode = "00";
+            sResponse.ResponseMessage = "Successful";
+            sResponse.Param = vResponse.Param;
 
             return sResponse;
         }

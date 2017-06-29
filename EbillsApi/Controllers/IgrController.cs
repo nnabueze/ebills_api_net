@@ -22,7 +22,7 @@ namespace EbillsApi.Controllers
         private string payerid;
         private string ercasBillerId;
         private string mda;
-        private IgrRepository p;
+        private string amount;
 
         public UtilityClass utility;
 
@@ -74,11 +74,11 @@ namespace EbillsApi.Controllers
         //getting NonTax
         private HttpResponseMessage GetNonTax(ValidationRequest vResponse)
         {
+            ParamToArray(vResponse.Param);
+
             //checking if step is 1
             if (vResponse.Step.Equals(1))
             {
-                ParamToArray(vResponse.Param);
-
                 if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(payerid))
                 {
                     return GetHttpMsg(vResponse, "Name or PayerId field can not be empty");
@@ -90,16 +90,25 @@ namespace EbillsApi.Controllers
             //checking if step is 2
             if (vResponse.Step.Equals(2))
             {
-                ParamToArray(vResponse.Param);
                 if (string.IsNullOrEmpty(mda) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(payerid) || string.IsNullOrEmpty(ercasBillerId))
                 {
                     return GetHttpMsg(vResponse, "Parameter Missing");
                 }
 
+                sResponse = utility.GetSubheadResponse(vResponse, 3, mda);
 
             }
 
             //checking if step is 3
+            if (vResponse.Step.Equals(3))
+            {
+                if (string.IsNullOrEmpty(amount))
+                {
+                    return GetHttpMsg(vResponse, "Amount field can not be empty");
+                }
+
+                sResponse = utility.GetResponse(vResponse, 4);
+            }
 
             return GetHttpMsg(vResponse);
 
@@ -146,6 +155,11 @@ namespace EbillsApi.Controllers
                 if (sList[i].key.Equals("mda")) 
                 {
                     mda = sList[i].value;
+                }
+
+                if (sList[i].key.Equals("amount")) 
+                {
+                    amount = sList[i].value;
                 }
             }
         }

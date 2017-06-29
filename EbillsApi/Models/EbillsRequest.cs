@@ -75,4 +75,16 @@ namespace EbillsApi.Models
         public string key { get; set; }
         public string value { get; set; }
     }
+
+    public class Mda
+    {
+        public int Id { get; set; }
+        public string mda_key { get; set; }
+        public string mda_category { get; set; }
+        public int igr_id { get; set; }
+        public string mda_name { get; set; }
+        public DateTime created_at { get; set; }
+        public DateTime Updated_at { get; set; }
+
+    }
 }

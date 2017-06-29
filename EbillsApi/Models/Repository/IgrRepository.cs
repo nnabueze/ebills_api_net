@@ -180,5 +180,79 @@ namespace EbillsApi.Models.Repository
             return ItemArrayList;
 
         }
+
+
+        //getting list of Subhead
+        public IList<Item> ListSubhead(int biller)
+        {            
+            IList<Item> ItemArrayList = new List<Item>();
+
+            MySql.Data.MySqlClient.MySqlDataReader mySqlReader = null;
+            string sqlString = "SELECT * FROM subheads WHERE mda_id =" + biller;
+
+            try
+            {
+                MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(sqlString, conn);
+                using (mySqlReader = cmd.ExecuteReader())
+                {
+                    while(mySqlReader.Read())
+                    {
+                        Item Mda = new Item();
+                        Mda.Name = (string) mySqlReader["subhead_name"];
+                        Mda.value = (string)mySqlReader["subhead_key"];
+
+                        ItemArrayList.Add(Mda);
+                    }
+                     
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+
+                throw ex;
+            }
+
+            return ItemArrayList;
+
+        }
+
+        //getting  a single Mda result
+        public Mda GetMda(string mdaKey)
+        {
+            Mda p = new Mda();
+            MySql.Data.MySqlClient.MySqlDataReader mySqlReader = null;
+
+            String sqlString = "SELECT * FROM mdas WHERE mda_key = '" + mdaKey + "'";
+            try
+            {
+                MySql.Data.MySqlClient.MySqlCommand cmd = new MySql.Data.MySqlClient.MySqlCommand(sqlString, conn);
+                using (mySqlReader = cmd.ExecuteReader())
+                {
+                    if (mySqlReader.Read())
+                    {
+                        p.Id = mySqlReader.GetInt32(0);
+                        p.igr_id = mySqlReader.GetInt32("igr_id");
+                        p.mda_category = (string)mySqlReader["mda_category"];
+                        p.mda_key = (string)mySqlReader["mda_key"];
+                        p.mda_name = (string)mySqlReader["mda_name"];
+                        p.created_at = (DateTime)mySqlReader["created_at"];
+                        p.Updated_at = (DateTime)mySqlReader["updated_at"];
+
+
+                        return p;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+
+                }
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }
